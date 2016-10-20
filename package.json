@@ -4,6 +4,7 @@
   "description": "",
   "main": "src/server.js",
   "scripts": {
+    "test": "tape -r babel-register 'src/**/*spec.js'",
     "start": "webpack-dev-server --hot --inline --content-base static"
   },
   "babel": {

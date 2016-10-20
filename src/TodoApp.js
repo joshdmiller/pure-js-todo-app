@@ -43,6 +43,25 @@ export default class TodoApp extends App {
     });
   }
 
+  changeTodo( id, fields ) {
+    const { todos } = this.getState();
+
+    const newTodos = todos.map( oldTodo => {
+      if ( oldTodo.getId() === id ) {
+        return new Todo({
+          ...oldTodo.getState(),
+          ...fields,
+        });
+      }
+
+      return oldTodo;
+    });
+
+    this.setState({
+      todos: newTodos,
+    });
+  }
+
   toggleFilter () {
     this.setState({
       filter: ! this.isFiltered(),
