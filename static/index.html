@@ -5,8 +5,15 @@
 
     <title>Todo App</title>
     <style>
+      /* BEM: Block-Element-Modifier */
+      .todo {}
+
       .todo--complete {
         text-decoration: line-through;
+      }
+
+      .todo__remove {
+        margin-left: 15px;
       }
     </style>
   </head>
@@ -25,6 +32,11 @@
       <li>Loading...</li>
     </ul>
 
+    <!-- load firebase -->
+    <script src="https://www.gstatic.com/firebasejs/3.3.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.3.0/firebase-database.js"></script>
+
+    <!-- load our app -->
     <script src="/static/bundle.js"></script>
   </body>
 </html>

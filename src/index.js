@@ -1,17 +1,15 @@
 import TodoApp from './TodoApp';
 import Todo from './Todo';
 
-const app = new TodoApp();
-window.app = app;
+var config = {
+  apiKey: "AIzaSyDjHucKpS3G_8mT8XUUyZfv-gvyhoq0zOo",
+  authDomain: "javascript-live-class-todo.firebaseapp.com",
+  databaseURL: "https://javascript-live-class-todo.firebaseio.com",
+  storageBucket: "javascript-live-class-todo.appspot.com",
+};
 
-/**
- * Dummy data
- */
-const todo1 = new Todo( 'First todo' );
-const todo2 = new Todo( 'Second todo' );
-todo2.toggle();
-const todo3 = new Todo( 'Third todo' );
-app.setTodos([ todo1, todo2, todo3 ]);
+const app = new TodoApp( config );
+window.app = app;
 
 /**
  * The event loop
@@ -58,19 +56,31 @@ function eventLoop () {
     todos.forEach( todo => {
       // create a new LI
       const li = document.createElement( 'li' );
+      const titleSpan = document.createElement( 'span' );
+      const rmSpan = document.createElement( 'span' );
 
       // populate the LI with title
-      li.textContent = todo.getTitle();
+      titleSpan.textContent = todo.getTitle();
+
+      rmSpan.textContent = 'x';
+      rmSpan.classList.add( 'todo__remove' );
 
       // if complete, set the class
       if ( todo.isComplete() ) {
-        li.classList.add( 'todo--complete' );
+        titleSpan.classList.add( 'todo--complete' );
       }
 
       // listen to clicks on the LI
-      li.addEventListener( 'click', () => {
+      titleSpan.addEventListener( 'click', () => {
         app.changeTodo( todo.getId(), { complete: ! todo.isComplete() } );
       });
+
+      rmSpan.addEventListener( 'click', () => {
+        app.rmTodo( todo.getId() );
+      });
+
+      li.appendChild( titleSpan );
+      li.appendChild( rmSpan );
 
       // add it to the todo list
       todoList.appendChild( li );
