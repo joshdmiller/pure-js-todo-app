@@ -1,14 +1,7 @@
 import TodoApp from './TodoApp';
 import Todo from './Todo';
 
-var config = {
-  apiKey: "AIzaSyDjHucKpS3G_8mT8XUUyZfv-gvyhoq0zOo",
-  authDomain: "javascript-live-class-todo.firebaseapp.com",
-  databaseURL: "https://javascript-live-class-todo.firebaseio.com",
-  storageBucket: "javascript-live-class-todo.appspot.com",
-};
-
-const app = new TodoApp( config );
+const app = new TodoApp();
 window.app = app;
 
 /**

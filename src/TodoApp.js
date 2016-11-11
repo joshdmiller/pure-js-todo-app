@@ -1,8 +1,11 @@
 import App from './App';
 import Todo from './Todo';
+import 'whatwg-fetch';
+
+const HOST = 'http://localhost:3000';
 
 export default class TodoApp extends App {
-  constructor ( config ) {
+  constructor () {
     super();
 
     this.setState({
@@ -11,36 +14,42 @@ export default class TodoApp extends App {
       todos: [],
     });
 
-    this.firebaseApp = firebase.initializeApp( config );
-    this.todos = this.firebaseApp.database().ref( 'todos' );
-
-    this.todos.on( 'value', snapshot => {
-      const todoObject = snapshot.val();
-      let todos = [];
-
-      if ( todoObject ) {
-        todos = Object.getOwnPropertyNames( todoObject ).map( id => new Todo({
-          ...todoObject[ id ],
-          id,
-        }));
-      }
-
-      this.setState({ todos, loading: false });
-    });
+    // fetch initial todos
+    fetch( `${HOST}/todos` )
+      .then( res => res.json() )
+      .then( todos => todos.map( t => new Todo( t ) ) )
+      .then( todos => this.setState({ todos }) )
+      ;
   }
 
   addTodo ( title ) {
     const { todos } = this.getState();
 
-    this.todos.push({
-      title,
-      complete: false,
-    });
+    // TODO: create on the server
+    fetch( `${HOST}/todos`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title,
+      }),
+    })
+      .then( res => res.json() )
+      .then( todo => new Todo( todo ) )
+      .then( todo => this.setState({ todos: [ ...todos, todo ] }))
+      ;
   }
 
   rmTodo ( id ) {
     const { todos } = this.getState();
-    this.todos.child( id ).remove();
+
+    fetch( `${HOST}/todos/${id}`, {
+      method: 'DELETE',
+    })
+      .then( () => this.setState({ todos: todos.filter( t => id !== t.getId() ) }))
+      ;
   }
 
   getTodos () {
@@ -63,10 +72,29 @@ export default class TodoApp extends App {
     const { todos } = this.getState();
     const oldTodo = todos.find( t => t.getId() === id );
 
-    this.todos.child( id ).set({
+    const newTodo = {
       ...oldTodo.getState(),
       ...fields,
-    });
+    };
+
+    fetch( `${HOST}/todos/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify( newTodo ),
+    })
+      .then( res => res.json() )
+      .then( todo => new Todo( todo ) )
+      .then( newTodo => this.setState({ todos: todos.map( todo => {
+        if ( id === todo.getId() ) {
+          return newTodo;
+        }
+
+        return todo;
+      })}))
+    ;
   }
 
   toggleFilter () {

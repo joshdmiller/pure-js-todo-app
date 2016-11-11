@@ -1,13 +1,12 @@
 import express from 'express';
 import db from './db';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 
 const app = express();
+app.use( cors() );
 app.use( bodyParser() );
-
-app.get( '/', ( req, res ) => {
-  res.send( 'hello' );
-});
+app.use( '/static', express.static( __dirname + '/../dist' ) );
 
 app.get( '/todos', ( req, res ) => {
   db.getTodos().then( todos => res.send( todos ) );
@@ -25,6 +24,10 @@ app.delete( '/todos/:id', ( req, res ) => {
 
 app.put( '/todos/:id', ( req, res ) => {
   db.changeTodo( req.params.id, req.body ).then( todo => res.send( todo ) );
+});
+
+app.get( '*', ( req, res ) => {
+  res.sendFile( __dirname + '/index.html' );
 });
 
 app.listen( 3000, function () {
