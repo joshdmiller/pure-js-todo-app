@@ -1,0 +1,19 @@
+<component name="libraryTable">
+  <library name="Generated files" type="javaScript">
+    <properties>
+      <sourceFilesUrls>
+        <item url="file://$PROJECT_DIR$/src/BonusScript-compiled.js" />
+        <item url="file://$PROJECT_DIR$/src/TodoApp.spec-compiled.js" />
+        <item url="file://$PROJECT_DIR$/src/index-compiled.js" />
+        <item url="file://$PROJECT_DIR$/src/Todo.spec-compiled.js" />
+      </sourceFilesUrls>
+    </properties>
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/src/BonusScript-compiled.js" />
+      <root url="file://$PROJECT_DIR$/src/TodoApp.spec-compiled.js" />
+      <root url="file://$PROJECT_DIR$/src/index-compiled.js" />
+      <root url="file://$PROJECT_DIR$/src/Todo.spec-compiled.js" />
+    </CLASSES>
+    <SOURCES />
+  </library>
+</component>

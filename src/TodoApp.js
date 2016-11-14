@@ -54,3 +54,26 @@ export default class TodoApp extends App {
   }
 }
 
+//Class Bonus question
+
+(function simpleScript() {
+
+  console.log('***********Simple App Script*************');
+
+  var simpleTodo = new TodoApp();
+
+  simpleTodo.addTodo('First todo');
+  simpleTodo.addTodo('Second todo');
+  simpleTodo.addTodo('Third todo');
+
+  var todos = simpleTodo.getTodos();
+
+  //In the future the UI will determine what array element?
+  todos[1].toggle();
+
+  todos.forEach( e => {
+    console.log('- [' + (() => {if (e.isComplete()) { return 'x'} else { return ''}})() + ']'+ ' ' + e.getTitle())
+  });
+
+})()
+
