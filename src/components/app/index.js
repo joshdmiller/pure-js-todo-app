@@ -1,4 +1,6 @@
 import React from 'react';
+import TodoList from '../todo-list';
+import NewTodoForm from '../new-todo-form';
 
 export default class App extends React.Component {
   constructor ( props ) {
@@ -22,62 +24,29 @@ export default class App extends React.Component {
     let todoList;
 
     if ( loading ) {
-      todoList = <li>Loading...</li>;
+      todoList = <h3>Loading...</h3>;
     } else if ( todos.length === 0 ) {
-      todoList = <li>No todos.</li>;
+      todoList = <h3>No todos.</h3>;
     } else {
-      todoList = todos
+      const filteredTodos = todos
         .filter( todo => filter ? ! todo.isComplete() : true )
-        .map( todo => (
-          <li
-            key={todo.getId()}
-            className={todo.isComplete() ? 'todo--complete' : ''}
-            >
-            <span
-              onClick={() => toggle( todo )}
-              >
-              { todo.getTitle() }
-            </span>
-            <span
-              className="todo__remove"
-              onClick={() => remove( todo )}
-              >
-                x
-              </span>
-          </li>
-        ));
+
+      todoList = <TodoList toggle={toggle} remove={remove} todos={filteredTodos} />;
     }
 
     return (
       <div>
         <h1>The Todo App</h1>
 
-        <form onSubmit={::this.submit} id="addTodoForm">
-          <label htmlFor="newTodoText"></label>
-          
-          <input
-            id="newTodoText"
-            type={this.state.newTodo }
-            onChange={ev => this.setState({ newTodo: ev.target.value })}
-          />
-
-          <button type="submit">Add Todo</button>
-        </form>
+        <NewTodoForm onCreate={create} />
 
         <button onClick={toggleFilter}>
           { filter ? 'Show Completed' : 'Hide Completed' }
         </button>
-
-        <ul id="todoList">
-          { todoList }
-        </ul>
+        
+        { todoList }
       </div>
     );
-  }
-
-  submit () {
-    this.props.create( this.state.newTodo );
-    this.setState({ newTodo: '' });
   }
 };
 
