@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="TodoApp">
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -17,19 +17,28 @@
       }
     </style>
   </head>
-  <body>
+  <body ng-controller="AppController as ctrl">
     <h1>The Todo App</h1>
 
-    <form id="addTodoForm">
+    <form ng-submit="ctrl.addTodo()">
       <label for="newTodoText"></label>
-      <input id="newTodoText" type="text" />
+      <input id="newTodoText" ng-model="ctrl.newTodoText" type="text" />
       <button type="submit">Add Todo</button>
     </form>
 
-    <button id="toggleBtn">Toggle</button>
+    <button ng-click="ctrl.toggleFilter()">
+      {{ ctrl.isFiltered() ? 'Show Completed' : 'Hide Completed' }}
+    </button>
 
     <ul id="todoList">
-      <li>Loading...</li>
+      <li ng-show="ctrl.state.loading">Loading...</li>
+      <li ng-show="!ctrl.state.loading && ctrl.state.todos.length === 0">
+        No todos.
+      </li>
+      <li ng-repeat="todo in ctrl.state.todos" ng-class="{ 'todo--complete': todo.isComplete() }">
+        <span ng-click="ctrl.toggleTodo( todo )">{{todo.getTitle()}}</span>
+        <span ng-click="ctrl.removeTodo( todo )" class="todo__remove">x</span>
+      </li>
     </ul>
 
     <!-- load our app -->

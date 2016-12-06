@@ -29,6 +29,7 @@
     "whatwg-fetch": "^1.0.0"
   },
   "devDependencies": {
+    "angular": "^1.5.9",
     "nodemon": "^1.11.0",
     "tape": "^4.6.0",
     "webpack": "^1.13.2",

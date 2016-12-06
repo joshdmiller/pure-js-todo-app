@@ -18,7 +18,7 @@ export default class TodoApp extends App {
     fetch( `${HOST}/todos` )
       .then( res => res.json() )
       .then( todos => todos.map( t => new Todo( t ) ) )
-      .then( todos => this.setState({ todos }) )
+      .then( todos => this.setState({ todos, loading: false }) )
       ;
   }
 

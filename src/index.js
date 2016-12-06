@@ -1,92 +1,45 @@
+import angular from 'angular';
 import TodoApp from './TodoApp';
 import Todo from './Todo';
 
-const app = new TodoApp();
-window.app = app;
+class AppController {
+  constructor ( $timeout, app ) {
+    this.app = app;
+    this.$to = $timeout;
+    app.subscribe( ::this._refresh );
+    this._refresh();
+  }
 
-/**
- * The event loop
- */
-function eventLoop () {
-  /**
-   * Render to DOM
-   * ( state ) => ui
-   */
-  const addTodoForm = document.getElementById( 'addTodoForm' );
-  const toggleBtn = document.getElementById( 'toggleBtn' );
-  const todoList = document.getElementById( 'todoList' );
-  const newTodoText = document.getElementById( 'newTodoText' );
+  _refresh () {
+    this.$to( () => {
+      this.state = this.app.getState();
 
-  // add event listeners
-  toggleBtn.addEventListener( 'click', () => {
-    app.toggleFilter();
-  });
-
-  addTodoForm.addEventListener( 'submit', event => {
-    event.preventDefault();
-    app.addTodo( newTodoText.value );
-  });
-
-  // Render when the state changes.
-  app.subscribe( () => render( app.getState() ) );
-  render( app.getState() );
-
-  function render ( state ) {
-    let { todos, filter } = state;
-
-    // set toggle button textj
-    let toggleBtnText = 'Hide Completed';
-    if ( filter ) {
-      toggleBtnText = 'Show Completed';
-      todos = todos.filter( t => ! t.isComplete() );
-    }
-    toggleBtn.textContent = toggleBtnText;
-
-    // empty the list
-    todoList.textContent = '';
-
-    // render out todos
-    todos.forEach( todo => {
-      // create a new LI
-      const li = document.createElement( 'li' );
-      const titleSpan = document.createElement( 'span' );
-      const rmSpan = document.createElement( 'span' );
-
-      // populate the LI with title
-      titleSpan.textContent = todo.getTitle();
-
-      rmSpan.textContent = 'x';
-      rmSpan.classList.add( 'todo__remove' );
-
-      // if complete, set the class
-      if ( todo.isComplete() ) {
-        titleSpan.classList.add( 'todo--complete' );
+      if ( this.state.filter ) {
+        this.state.todos = this.state.todos.filter( t => ! t.isComplete() );
       }
-
-      // listen to clicks on the LI
-      titleSpan.addEventListener( 'click', () => {
-        app.changeTodo( todo.getId(), { complete: ! todo.isComplete() } );
-      });
-
-      rmSpan.addEventListener( 'click', () => {
-        app.rmTodo( todo.getId() );
-      });
-
-      li.appendChild( titleSpan );
-      li.appendChild( rmSpan );
-
-      // add it to the todo list
-      todoList.appendChild( li );
     });
+  }
+
+  toggleFilter () {
+    this.app.toggleFilter();
+  }
+
+  toggleTodo ( todo ) {
+    this.app.changeTodo( todo.getId(), { complete: ! todo.isComplete() })
+  }
+
+  removeTodo ( todo ) {
+    this.app.rmTodo( todo.getId() );
+  }
+
+  addTodo () {
+    this.app.addTodo( this.newTodoText );
+    this.newTodoText = '';
   }
 }
 
-/**
- * As soon as we have the DOM, kick things off
- */
-if ( document.readyState !== 'loading' ) {
-  eventLoop();
-} else {
-  document.addEventListener( 'DOMContentLoaded', eventLoop );
-}
+angular.module( 'TodoApp', [] )
+  .service( 'app', TodoApp )
+  .controller( 'AppController', AppController )
+  ;
 
