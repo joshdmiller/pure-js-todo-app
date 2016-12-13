@@ -1,26 +1,49 @@
-export function double ( x ) {
-  return x * 2;
+// TODO
+//   x prototypes (delegate)
+//   x constructor functions
+//   x new keyword
+//   - es2015 sugar: class keyword
+
+
+export const todoPrototype = {
+  title: 'hello',
+  complete: false,
+
+  getTitle () {
+    return this.title;
+  },
+
+  setTitle ( newTitle ) {
+    this.title = newTitle;
+  },
+};
+
+todoPrototype.toggleComplete = function () {
+  this.toggleComplete = ! this.toggleComplete;
+};
+
+export const Todo = function ( title ) {
+  // const todo = Object.create( todoPrototype );
+
+  this.title = title;
+
+  // return todo;
 }
 
-export function doubleXTimes ( x, num ) {
-  let result = x;
+Todo.prototype = todoPrototype;
 
-  for ( let i = 1; i <= num; i++ ) {
-    // result = result * 2;
-    result = double( result );
+export class TodoClass {
+  constructor ( title ) {
+    this.title = title;
+    this.complete = false;
   }
 
-  return result;
-}
+  getTitle () {
+    return this.title;
+  }
 
-export function doubleEach ( arr ) {
-  let result = arr.map( double );
-
-  // const result = arr.map( x => double( x ) );
-  // const result = arr.map( function ( x ) {
-  //   return double( x );
-  // });
-
-  return result;
+  setTitle ( newTitle ) {
+    this.title = newTitle;
+  }
 }
 

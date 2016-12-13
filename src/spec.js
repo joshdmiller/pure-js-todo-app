@@ -1,29 +1,42 @@
 import test from 'tape';
-import { double, doubleXTimes, doubleEach } from './index';
+import { TodoClass, Todo, todoPrototype } from './index';
 
-test( 'double fn', function ( test ) {
-  const actual = double( 5 );
-  const expected = 10;
+test( 'Todo', function ( test ) {
+  let actual, expected, todo;
 
-  test.equal( actual, expected, 'should double the value' );
+  // with es6 classes
+  todo = new TodoClass( 'First Todo' );
 
-  test.end();
-});
+  actual = todo.getTitle();
+  expected = 'First Todo';
+  test.equal( actual, expected, 'getTitle should return the title' );
 
-test( 'doubleXTimes', function ( test ) {
-  const actual = doubleXTimes( 5, 3 );
-  const expected = 40;
 
-  test.equal( actual, expected, 'should double 5 three times' );
+  // new:
+  //   - creates a new object
+  //   - binds function to new object
+  //   - returns the new object
+  todo = new Todo( 'Another Todo' );
 
-  test.end();
-});
+  actual = todo.getTitle();
+  expected = 'Another Todo';
+  test.equal( actual, expected, 'getTitle should return the title' );
 
-test( 'doubleEach', function ( test ) {
-  const actual = doubleEach([ 0, 1, 2 ]);
-  const expected = [ 0, 2, 4 ];
+  // Same, but without the new keyword
+  todo = Object.create( todoPrototype );
+  Todo.call( todo, 'Newless Todo' );
 
-  test.deepEqual( actual, expected, 'should double each in the array' );
+  // protype chain:
+  //   null
+  //   Object.prototype
+  //   todoPrototype
+  //   todo
+  //   groupTodo // instance
+  const groupTodo = Object.create( todo );
+
+  actual = todo.getTitle();
+  expected = 'Newless Todo';
+  test.equal( actual, expected, 'getTitle should return the title' );
 
   test.end();
 });
