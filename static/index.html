@@ -4,9 +4,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Todo App</title>
+    <style>
+      .todo--complete {
+        text-decoration: line-through;
+      }
+    </style>
   </head>
   <body>
-    <h1>The Todo App is Running!</h1>
+    <h1>The Todo App</h1>
+
+    <form id="addTodoForm">
+      <label for="newTodoText"></label>
+      <input id="newTodoText" type="text" />
+      <button type="submit">Add Todo</button>
+    </form>
+
+    <button id="toggleBtn">Toggle</button>
+
+    <ul id="todoList">
+      <li>Loading...</li>
+    </ul>
 
     <script src="/static/bundle.js"></script>
   </body>
