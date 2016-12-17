@@ -66,12 +66,12 @@ export default () => {
     },
 
     toggleComplete ( id ) {
-      const todos = _changeTodo( id, todo => todo.toggleComplete() );
+      const todos = this._changeTodo( id, todo => todo.toggleComplete() );
       this.setState({ todos });
     },
 
     setTitle ( id, title ) {
-      const todos = _changeTodo( id, todo => todo.setTitle( title ) );
+      const todos = this._changeTodo( id, todo => todo.setTitle( title ) );
       this.setState({ todos });
     },
 

@@ -51,6 +51,20 @@ test( 'TodoApp', t => {
   expected = 2;
   t.equal( actual, expected, 'setTodos should replace all todos witht those provided' );
 
+  app = TodoApp();
+  app.addTodo({ id: '1', complete: false, title: 'One' });
+  app.addTodo({ id: '2', complete: false, title: 'Two' });
+
+  app.toggleComplete( '1' );
+  let [ todo1, todo2 ] = app.getTodos();
+  t.equal( todo1.isComplete(), true, 'toggleComplete should toggle the status of the todo' );
+  t.equal( todo2.isComplete(), false, 'toggleComplete should not toggle other todos' );
+
+  app.setTitle( '2', 'New' );
+  [ todo1, todo2 ] = app.getTodos();
+  t.equal( todo1.getTitle(), 'One', 'setTitle should not change other todos' );
+  t.equal( todo2.getTitle(), 'New', 'setTitle should change the title of the todo' );
+
   t.end();
 });
 
