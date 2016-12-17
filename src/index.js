@@ -58,33 +58,28 @@ const onReady = function () {
     // Set the filter button text.
     toggleBtn.textContent = filter ? 'Show Completed' : 'Hide Completed';
 
-    // We need to first get rid of all the todos we already drew out, so we don't need to check
-    // which ones we need to update manually.
-    todoList.textContent = '';
-
     /**
      * For each todo, plop a list item.
      */
+    let listHtml = '';
     todos.forEach( todo => {
-      // Create a new LIm but don't put it anywhere on the page just yet.
-      const li = document.createElement( 'li' );
+      const classes = todo.isComplete() ? 'todo--complete' : '';
 
-      // Populate the LI with title of the todo.
-      li.textContent = todo.getTitle();
-
-      // If complete, add a class so we can put in some strikethrough.
-      if ( todo.isComplete() ) {
-        li.classList.add( 'todo--complete' );
-      }
-
-      // Listen to clicks on the LI and toggle the completion status then.
-      li.addEventListener( 'click', () => {
-        app.toggleComplete( todo.getId() );
-      });
-
-      // Finally, dd it to the todo list so it will appear on the page.
-      todoList.appendChild( li );
+      // Important note: in the real world, this is a security problem; before injecting html from a
+      // variable, you'll want to sanitize it first to prevent an XSS attack.
+      listHtml += `
+        <li data-id="${todo.getId()}" class="${classes}">
+          ${todo.getTitle()}
+        </li>
+      `;
     });
+
+    // Set the html into the 
+    todoList.innerHTML = listHtml;
+
+    todoList.querySelectorAll( 'li' ).forEach( li => li.addEventListener( 'click', function () {
+      app.toggleComplete( this.getAttribute( 'data-id' ) );
+    }));
   };
 
   /**
