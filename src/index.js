@@ -1,5 +1,8 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
 import TodoApp from './TodoApp';
 import Todo from './Todo';
+import App from './components/app';
 
 /**
  * Our Main Code
@@ -24,63 +27,18 @@ const onReady = function () {
   app.setTodos([ todo1, todo2, todo3 ]);
 
   /**
-   * Grab a reference to our existing DOM elements
-   */
-  const addTodoForm = document.getElementById( 'addTodoForm' );
-  const toggleBtn = document.getElementById( 'toggleBtn' );
-  const todoList = document.getElementById( 'todoList' );
-  const newTodoText = document.getElementById( 'newTodoText' );
-
-  /**
-   * Event Listener: when the filter button is clicked, toggle the filter status.
-   */
-  toggleBtn.addEventListener( 'click', () => {
-    app.toggleFilter();
-  });
-
-  /**
-   * Event Listener: when the form is submitted, create a new todo and clear the text.
-   */
-  addTodoForm.addEventListener( 'submit', event => {
-    event.preventDefault();
-    app.addTodo( newTodoText.value );
-    newTodoText.value = '';
-  });
-
-  /**
    * A helper function for drawing the view.
    * ( state ) => ui
    */
-  const renderTheView = () => {
-    const filter = app.isFiltered();
-    const todos = app.getTodos();
-
-    // Set the filter button text.
-    toggleBtn.textContent = filter ? 'Show Completed' : 'Hide Completed';
-
-    /**
-     * For each todo, plop a list item.
-     */
-    let listHtml = '';
-    todos.forEach( todo => {
-      const classes = todo.isComplete() ? 'todo--complete' : '';
-
-      // Important note: in the real world, this is a security problem; before injecting html from a
-      // variable, you'll want to sanitize it first to prevent an XSS attack.
-      listHtml += `
-        <li data-id="${todo.getId()}" class="${classes}">
-          ${todo.getTitle()}
-        </li>
-      `;
-    });
-
-    // Set the html into the 
-    todoList.innerHTML = listHtml;
-
-    todoList.querySelectorAll( 'li' ).forEach( li => li.addEventListener( 'click', function () {
-      app.toggleComplete( this.getAttribute( 'data-id' ) );
-    }));
-  };
+  const renderTheView = () => ReactDOM.render(
+    <App
+      filter={app.isFiltered()}
+      todos={app.getTodos()}
+      markComplete={app::app.toggleComplete}
+      create={app::app.addTodo}
+      toggleFilter={app::app.toggleFilter}
+    />, document.getElementById( 'app' )
+  );
 
   /**
    * Whenever our app state changes, let's redraw the view to reflect it.
@@ -93,7 +51,6 @@ const onReady = function () {
    */
   renderTheView();
 };
-
 
 /**
  * As soon as the browser is ready, let's kick things off
