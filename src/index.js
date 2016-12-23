@@ -1,27 +1,18 @@
 import TodoApp from './TodoApp';
 import Todo from './Todo';
+import firebaseConfig from './config';
 
 /**
  * Our Main Code
  */
 
 const onReady = function () {
-  const app = TodoApp();
+  const app = TodoApp( firebaseConfig );
 
   /**
    * Expose the app on the `window` object so we can play with it in the console.
    */
   window.app = app;
-
-  /**
-   * Set Up Test Data
-   */
-  const todo1 = Todo( 'First Todo' );
-  const todo2 = Todo( 'Second Todo' );
-  const todo3 = Todo( 'Third Todo' );
-  todo2.toggleComplete();
-
-  app.setTodos([ todo1, todo2, todo3 ]);
 
   /**
    * Grab a reference to our existing DOM elements
@@ -64,25 +55,40 @@ const onReady = function () {
 
     /**
      * For each todo, plop a list item.
+     * <li>
+     *   <span>First Todo</span> <-- click to complete
+     *   <span class="todo__remove">x</span> <-- click to remove
+     * </li>
      */
     todos.forEach( todo => {
       // Create a new LIm but don't put it anywhere on the page just yet.
       const li = document.createElement( 'li' );
+      const titleSpan = document.createElement( 'span' );
+      const removeSpan = document.createElement( 'span' );
 
       // Populate the LI with title of the todo.
-      li.textContent = todo.getTitle();
+      titleSpan.textContent = todo.getTitle();
+      removeSpan.textContent = 'x';
+      removeSpan.classList.add( 'todo__remove' );
 
       // If complete, add a class so we can put in some strikethrough.
       if ( todo.isComplete() ) {
-        li.classList.add( 'todo--complete' );
+        titleSpan.classList.add( 'todo--complete' );
       }
 
       // Listen to clicks on the LI and toggle the completion status then.
-      li.addEventListener( 'click', () => {
+      titleSpan.addEventListener( 'click', () => {
         app.toggleComplete( todo.getId() );
       });
 
+      // Listen to clicks on the LI and toggle the completion status then.
+      removeSpan.addEventListener( 'click', () => {
+        app.rmTodo( todo.getId() );
+      });
+
       // Finally, dd it to the todo list so it will appear on the page.
+      li.appendChild( titleSpan );
+      li.appendChild( removeSpan );
       todoList.appendChild( li );
     });
   };

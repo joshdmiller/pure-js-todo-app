@@ -5,8 +5,25 @@
 
     <title>Todo App</title>
     <style>
+      /**
+        Block-Element-Modifier
+      */
+      .todo {
+        /* block */
+      }
+
+      /* modifier: for completion */
       .todo--complete {
         text-decoration: line-through;
+      }
+
+      /* element: remove icon */
+      .todo__remove {
+        margin-left: 10px;
+      }
+
+      .todo__remove--disabled {
+        /* modifer: disable the remove element of the todo block */
       }
     </style>
   </head>
@@ -24,6 +41,10 @@
     <ul id="todoList">
       <li>Loading...</li>
     </ul>
+
+    <!-- load firebase -->
+    <script src="https://www.gstatic.com/firebasejs/3.3.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.3.0/firebase-database.js"></script>
 
     <script src="/static/bundle.js"></script>
   </body>
