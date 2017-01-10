@@ -7,6 +7,7 @@
     "start": "node server.js",
     "start:be:dev": "nodemon server.js",
     "start:fe:dev": "webpack-dev-server --hot --inline --content-base static",
+    "build": "webpack",
     "test": "tape -r babel-register 'src/**/*spec.js'"
   },
   "babel": {
@@ -24,7 +25,8 @@
     "body-parser": "^1.15.2",
     "cors": "^2.8.1",
     "express": "^4.14.0",
-    "shortid": "^2.2.6"
+    "shortid": "^2.2.6",
+    "whatwg-fetch": "^2.0.1"
   },
   "devDependencies": {
     "babel-core": "^6.21.0",

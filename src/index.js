@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import TodoApp from './TodoApp';
 import Todo from './Todo';
 import App from './components/app';
+import 'whatwg-fetch';
 
 /**
  * Our Main Code

@@ -3,6 +3,8 @@ import notifyMixin from './mixins/notify';
 import State from './mixins/state';
 import Todo from './Todo';
 
+const API_URI = 'http://localhost:3000';
+
 const initialState = {
   todos: [],
   filter: false,
@@ -40,40 +42,82 @@ export default () => {
      */
 
     addTodo ( title ) {
-      const todo = Todo( title );
       const todos = this.getState().todos;
-      this.setState({ todos: [ ...todos, todo ] });
+
+      fetch( `${API_URI}/todos`, {
+        method: 'POST',
+        body: JSON.stringify({
+          title,
+        }),
+        headers: {
+          // MIME type
+          'Content-Type': 'application/json',
+        },
+      })
+        .then( res => res.json() )
+        .then( todo => Todo( todo ) )
+        .then( todo => this.setState({ todos: [ ...todos, todo ] }) )
+        ;
     },
 
     rmTodo ( id ) {
       const todos = this.getState().todos;
-      this.setState({
-        todos: todos.filter( todo => todo.getId() !== id ),
-      });
+
+      fetch( `${API_URI}/todos/${id}`, { method: 'DELETE' })
+        // .then( res => res.json() )
+        .then( () => this.setState({
+          todos: todos.filter( todo => todo.getId() !== id ),
+        }))
+        ;
     },
 
-    _changeTodo ( id, fn ) {
-      return this.getState().todos
-        .map( todo => {
-          if ( todo.getId() === id ) {
-            fn( todo )
+    // _changeTodo ( id, fn ) {
+    //   return this.getState().todos
+    //     .map( todo => {
+    //       if ( todo.getId() === id ) {
+    //         fn( todo )
+    //         return todo;
+    //       }
+
+    //       return todo;
+    //     })
+    //   ;
+    // },
+
+    toggleComplete ( id ) {
+      const todo = this.getState().todos.find( todo => todo.getId() === id );
+
+      fetch( `${API_URI}/todos/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          complete: ! todo.isComplete(),
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then( res => res.json() )
+        .then( todo => Todo( todo ) )
+        .then( todo => this.getState().todos.map( t => {
+          if ( t.getId() === id ) {
             return todo;
           }
 
-          return todo;
-        })
-      ;
+          return t;
+        }))
+        .then( todos => this.setState({ todos }))
+        ;
     },
 
-    toggleComplete ( id ) {
-      const todos = this._changeTodo( id, todo => todo.toggleComplete() );
-      this.setState({ todos });
-    },
-
-    setTitle ( id, title ) {
-      const todos = this._changeTodo( id, todo => todo.setTitle( title ) );
-      this.setState({ todos });
-    },
+    // setTitle ( id, title ) {
+    //   // const todos = this._changeTodo( id, todo => todo.setTitle( title ) );
+    //   // this.setState({ todos });
+    //   const todo = this.getState().todos.find( todo => todo.getId() === id );
+    //   dbTodos.child( id ).set({
+    //     ...todo.getState(),
+    //     title,
+    //   });
+    // },
 
     /**
      * Listeners!
@@ -85,10 +129,17 @@ export default () => {
     }
   };
 
+  fetch( `${API_URI}/todos` )
+    .then( res => res.json() )
+    .then( todos => todos.map( t => Todo( t ) ) )
+    .then( todos => app.setTodos( todos ) )
+    ;
+
   return compose(
     notifyMixin,
     stateMixin,
     TodoAppPrototype
   );
+
 };
 
