@@ -3,16 +3,15 @@ import notifyMixin from './mixins/notify';
 import State from './mixins/state';
 import Todo from './Todo';
 
+const API_URI = 'http://localhost:3000';
+
 const initialState = {
   todos: [],
   filter: false,
 };
 
-export default ( firebaseConfig ) => {
+export default () => {
   const stateMixin = State( initialState );
-
-  const firebaseApp = firebase.initializeApp( firebaseConfig );
-  const dbTodos = firebaseApp.database().ref( 'todos' );
 
   const TodoAppPrototype = {
     /**
@@ -43,59 +42,99 @@ export default ( firebaseConfig ) => {
      */
 
     addTodo ( title ) {
-      // const todo = Todo( title );
-      // const todos = this.getState().todos;
+      const todos = this.getState().todos;
+
+      fetch( `${API_URI}/todos`, {
+        method: 'POST',
+        body: JSON.stringify({
+          title,
+        }),
+        headers: {
+          // MIME type
+          'Content-Type': 'application/json',
+        },
+      })
+        .then( res => res.json() )
+        .then( todo => Todo( todo ) )
+        .then( todo => this.setState({ todos: [ ...todos, todo ] }) )
+        ;
+      // const todo = Todo( todoFromServer );
       // this.setState({ todos: [ ...todos, todo ] });
 
       // now push it to the db
-      dbTodos.push({
-        title,
-        complete: false,
-      });
+      // dbTodos.push({
+      //   title,
+      //   complete: false,
+      // });
     },
 
     rmTodo ( id ) {
-      // const todos = this.getState().todos;
-      // this.setState({
-      //   todos: todos.filter( todo => todo.getId() !== id ),
-      // });
+      const todos = this.getState().todos;
+
+      fetch( `${API_URI}/todos/${id}`, { method: 'DELETE' })
+        // .then( res => res.json() )
+        .then( () => this.setState({
+          todos: todos.filter( todo => todo.getId() !== id ),
+        }))
+        ;
 
       // analogy: dbTodos[ id ]
-      dbTodos.child( id ).remove();
+      // dbTodos.child( id ).remove();
     },
 
-    // _changeTodo ( id, fn ) {
-    //   return this.getState().todos
-    //     .map( todo => {
-    //       if ( todo.getId() === id ) {
-    //         fn( todo )
-    //         return todo;
-    //       }
+    _changeTodo ( id, fn ) {
+      return this.getState().todos
+        .map( todo => {
+          if ( todo.getId() === id ) {
+            fn( todo )
+            return todo;
+          }
 
-    //       return todo;
-    //     })
-    //   ;
-    // },
+          return todo;
+        })
+      ;
+    },
 
     toggleComplete ( id ) {
-      // const todos = this._changeTodo( id, todo => todo.toggleComplete() );
-      // this.setState({ todos });
       const todo = this.getState().todos.find( todo => todo.getId() === id );
-      dbTodos.child( id ).set({
-        ...todo.getState(),
-        complete: ! todo.isComplete(),
-      });
+
+      fetch( `${API_URI}/todos/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          complete: ! todo.isComplete(),
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then( res => res.json() )
+        .then( todo => Todo( todo ) )
+        .then( todo => this.getState().todos.map( t => {
+          if ( t.getId() === id ) {
+            return todo;
+          }
+
+          return t;
+        }))
+        .then( todos => this.setState({ todos }))
+        ;
+
+      // const todos = this._changeTodo( id, todo => todo.toggleComplete() );
+      // dbTodos.child( id ).set({
+      //   ...todo.getState(),
+      //   complete: ! todo.isComplete(),
+      // });
     },
 
-    setTitle ( id, title ) {
-      // const todos = this._changeTodo( id, todo => todo.setTitle( title ) );
-      // this.setState({ todos });
-      const todo = this.getState().todos.find( todo => todo.getId() === id );
-      dbTodos.child( id ).set({
-        ...todo.getState(),
-        title,
-      });
-    },
+    // setTitle ( id, title ) {
+    //   // const todos = this._changeTodo( id, todo => todo.setTitle( title ) );
+    //   // this.setState({ todos });
+    //   const todo = this.getState().todos.find( todo => todo.getId() === id );
+    //   dbTodos.child( id ).set({
+    //     ...todo.getState(),
+    //     title,
+    //   });
+    // },
 
     /**
      * Listeners!
@@ -113,39 +152,11 @@ export default ( firebaseConfig ) => {
     TodoAppPrototype
   );
 
-  dbTodos.on( 'value', snapshot => {
-    const todoObject = snapshot.val();
-
-    let todos = [];
-
-    if ( todoObject ) {
-      // e.g. {
-      //  'id1': { id: 'id1', complete: false, title: 'First Todo', },
-      //  'id2': { id: 'id2', complete: false, title: 'Second Todo', },
-      //  'id3': { complete: false, title: 'Third Todo', },
-      // }
-      // getOwnPropertyNames: [ 'id1', 'id2', 'id3' ]
-      // map: [
-      //  { id: 'id1', complete: false, title: 'First Todo', },
-      //  { id: 'id2', complete: false, title: 'Second Todo', },
-      //  { complete: false, title: 'Third Todo', },
-      // ]
-      // map2: [
-      //   Todo(),
-      //   Todo(),
-      //   Todo(),
-      // ]
-      todos = Object.getOwnPropertyNames( todoObject )
-        .map( id => ({
-          ...todoObject[ id ],
-          id,
-        }))
-        .map( todo => Todo( todo ) )
-        ;
-    }
-
-    app.setTodos( todos );
-  });
+  fetch( `${API_URI}/todos` )
+    .then( res => res.json() )
+    .then( todos => todos.map( t => Todo( t ) ) )
+    .then( todos => app.setTodos( todos ) )
+    ;
 
   return app;
 };

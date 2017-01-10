@@ -1,13 +1,13 @@
 import TodoApp from './TodoApp';
 import Todo from './Todo';
-import firebaseConfig from './config';
+import 'whatwg-fetch';
 
 /**
  * Our Main Code
  */
 
 const onReady = function () {
-  const app = TodoApp( firebaseConfig );
+  const app = TodoApp();
 
   /**
    * Expose the app on the `window` object so we can play with it in the console.
