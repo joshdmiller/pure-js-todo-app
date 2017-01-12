@@ -10,7 +10,7 @@ const initialState = {
   filter: false,
 };
 
-export default () => {
+const TodoApp = ( $http ) => {
   const stateMixin = State( initialState );
 
   const TodoAppPrototype = {
@@ -44,17 +44,10 @@ export default () => {
     addTodo ( title ) {
       const todos = this.getState().todos;
 
-      fetch( `${API_URI}/todos`, {
-        method: 'POST',
-        body: JSON.stringify({
-          title,
-        }),
-        headers: {
-          // MIME type
-          'Content-Type': 'application/json',
-        },
+      $http.post( `${API_URI}/todos`, {
+        title,
       })
-        .then( res => res.json() )
+        .then( res => res.data )
         .then( todo => Todo( todo ) )
         .then( todo => this.setState({ todos: [ ...todos, todo ] }) )
         ;
@@ -71,8 +64,8 @@ export default () => {
     rmTodo ( id ) {
       const todos = this.getState().todos;
 
-      fetch( `${API_URI}/todos/${id}`, { method: 'DELETE' })
-        // .then( res => res.json() )
+      $http.delete( `${API_URI}/todos/${id}` )
+        // .then( res => res.data )
         .then( () => this.setState({
           todos: todos.filter( todo => todo.getId() !== id ),
         }))
@@ -98,16 +91,10 @@ export default () => {
     toggleComplete ( id ) {
       const todo = this.getState().todos.find( todo => todo.getId() === id );
 
-      fetch( `${API_URI}/todos/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          complete: ! todo.isComplete(),
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      $http.put( `${API_URI}/todos/${id}`, {
+        complete: ! todo.isComplete(),
       })
-        .then( res => res.json() )
+        .then( res => res.data )
         .then( todo => Todo( todo ) )
         .then( todo => this.getState().todos.map( t => {
           if ( t.getId() === id ) {
@@ -152,12 +139,15 @@ export default () => {
     TodoAppPrototype
   );
 
-  fetch( `${API_URI}/todos` )
-    .then( res => res.json() )
+  $http.get( `${API_URI}/todos` )
+    .then( response => response.data )
     .then( todos => todos.map( t => Todo( t ) ) )
     .then( todos => app.setTodos( todos ) )
     ;
 
   return app;
 };
+TodoApp.$inject = [ '$http' ];
+
+export default TodoApp;
 

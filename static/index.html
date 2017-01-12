@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="todoApp">
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -27,24 +27,30 @@
       }
     </style>
   </head>
-  <body>
+  <body ng-controller="TodoController as ctrl">
     <h1>The Todo App</h1>
 
-    <form id="addTodoForm">
+    <form ng-submit="ctrl.addTodo( newTodoText )">
       <label for="newTodoText"></label>
-      <input id="newTodoText" type="text" />
+      <input id="newTodoText" type="text" ng-model="newTodoText" />
       <button type="submit">Add Todo</button>
     </form>
 
-    <button id="toggleBtn">Toggle</button>
+    <button ng-click="ctrl.toggleFilter()">
+      {{ ctrl.isFiltered() ? 'Show Completed' : 'Hide Completed' }}
+    </button>
 
-    <ul id="todoList">
-      <li>Loading...</li>
+    <ul>
+      <li ng-if="ctrl.todos.length === 0">Loading...</li>
+
+      <li
+        ng-repeat="todo in ctrl.todos"
+        ng-click="ctrl.toggleComplete( todo )"
+        ng-class="{ 'todo--complete': todo.isComplete() }"
+        >
+        {{ todo.getTitle() }}
+      </li>
     </ul>
-
-    <!-- load firebase -->
-    <script src="https://www.gstatic.com/firebasejs/3.3.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/3.3.0/firebase-database.js"></script>
 
     <script src="/static/bundle.js"></script>
   </body>
